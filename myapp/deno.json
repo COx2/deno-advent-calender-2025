@@ -1,0 +1,23 @@
+{
+  "tasks": {
+    "build": "deno run --allow-all build.ts",
+    "build:debug": "deno run --allow-all build.ts --config Debug",
+    "build:release": "deno run --allow-all build.ts --config Release",
+    "clean": "deno run --allow-all build.ts --clean",
+    "rebuild": "deno run --allow-all build.ts --clean && deno run --allow-all build.ts --config Release",
+    "test": "deno run --allow-all build.ts --test",
+    "format": "deno fmt",
+    "format:check": "deno fmt --check",
+    "lint": "deno lint"
+  },
+  "fmt": {
+    "files": {
+      "include": ["build.ts", "build.config.ts", "cmake-file-api.ts", "cmake-types.ts"]
+    }
+  },
+  "lint": {
+    "files": {
+      "include": ["build.ts", "build.config.ts", "cmake-file-api.ts", "cmake-types.ts"]
+    }
+  }
+}

@@ -80,9 +80,10 @@
             </div>
 
             <h3>Step 2: プロジェクトを生成</h3>
-            <pre><code class="language-bash">deno run --allow-read --allow-write --allow-run \
-  https://raw.githubusercontent.com/COx2/deno-advent-calender-2025/main/generator/generate.ts \
-  --name "MyProject" --author "Your Name" --with-git</code></pre>
+            <div class="code-block">
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                <pre><code class="language-bash" id="generate-cmd">deno run --allow-read --allow-write --allow-run https://raw.githubusercontent.com/COx2/deno-advent-calender-2025/main/generator/generate.ts --name "MyProject" --author "Your Name" --with-git</code></pre>
+            </div>
 
             <h3>Step 3: ビルド & 実行</h3>
             <pre><code class="language-bash">cd myproject
@@ -213,6 +214,19 @@ Version: 1.0.0
                 document.getElementById(tabId).classList.add('active');
             });
         });
+
+        function copyCode(btn) {
+            const codeBlock = btn.parentElement.querySelector('code');
+            const text = codeBlock.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
     </script>
 </body>
 </html>

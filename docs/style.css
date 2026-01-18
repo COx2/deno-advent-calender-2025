@@ -334,8 +334,50 @@ a:hover {
 }
 
 .output-example pre {
-    background-color: #1a1a1a;
+    background-color: #1e1e1e;
     margin: 0;
+}
+
+.output-example pre code {
+    color: #e0e0e0;
+    font-size: 0.9rem;
+}
+
+/* ========================================
+   Code Block with Copy Button
+   ======================================== */
+
+.code-block {
+    position: relative;
+}
+
+.code-block pre {
+    margin: 0;
+}
+
+.copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ccc;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.copy-btn.copied {
+    background-color: var(--success-color);
+    color: white;
+    border-color: var(--success-color);
 }
 
 /* ========================================

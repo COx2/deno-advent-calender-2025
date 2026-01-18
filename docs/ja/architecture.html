@@ -31,35 +31,78 @@
             <h2>システム概要</h2>
 
             <div class="architecture-diagram">
-                <pre class="diagram">
-┌─────────────────────────────────────────────────────────────────┐
-│                     Deno Runtime                                 │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
-│  │ generate.ts  │───▶│ templates.ts │───▶│ Project      │      │
-│  │ (Entry)      │    │ (Templates)  │    │ Files        │      │
-│  └──────────────┘    └──────────────┘    └──────────────┘      │
-│         │                                                        │
-│         ▼                                                        │
-│  ┌──────────────────────────────────────────────────────┐       │
-│  │                  Generated Project                     │       │
-│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐      │       │
-│  │  │ build.ts   │  │ cmake-     │  │ cmake-     │      │       │
-│  │  │            │  │ file-api.ts│  │ types.ts   │      │       │
-│  │  └─────┬──────┘  └─────┬──────┘  └────────────┘      │       │
-│  │        │               │                               │       │
-│  │        ▼               ▼                               │       │
-│  │  ┌──────────────────────────┐                         │       │
-│  │  │         CMake            │                         │       │
-│  │  │  ┌──────────────────┐   │                         │       │
-│  │  │  │  File API v1     │   │                         │       │
-│  │  │  └──────────────────┘   │                         │       │
-│  │  └──────────────────────────┘                         │       │
-│  └──────────────────────────────────────────────────────┘       │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-                </pre>
+                <svg viewBox="0 0 700 420" xmlns="http://www.w3.org/2000/svg" style="max-width: 700px; width: 100%;">
+                    <style>
+                        .box { fill: none; stroke: #70c0ba; stroke-width: 2; }
+                        .box-inner { fill: none; stroke: #4a9a94; stroke-width: 1.5; }
+                        .box-nested { fill: none; stroke: #666; stroke-width: 1; }
+                        .text-title { fill: #b5cea8; font-family: 'Fira Code', monospace; font-size: 14px; font-weight: bold; }
+                        .text-label { fill: #b5cea8; font-family: 'Fira Code', monospace; font-size: 11px; }
+                        .text-small { fill: #888; font-family: 'Fira Code', monospace; font-size: 9px; }
+                        .arrow { stroke: #70c0ba; stroke-width: 2; fill: none; }
+                        .arrow-head { fill: #70c0ba; }
+                    </style>
+
+                    <!-- Outer box: Deno Runtime -->
+                    <rect x="10" y="10" width="680" height="400" rx="5" class="box"/>
+                    <text x="350" y="35" text-anchor="middle" class="text-title">Deno Runtime</text>
+                    <line x1="10" y1="50" x2="690" y2="50" stroke="#70c0ba" stroke-width="2"/>
+
+                    <!-- Top row: generate.ts -> templates.ts -> Project Files -->
+                    <rect x="40" y="70" width="120" height="50" rx="3" class="box-inner"/>
+                    <text x="100" y="92" text-anchor="middle" class="text-label">generate.ts</text>
+                    <text x="100" y="107" text-anchor="middle" class="text-small">(Entry)</text>
+
+                    <rect x="220" y="70" width="120" height="50" rx="3" class="box-inner"/>
+                    <text x="280" y="92" text-anchor="middle" class="text-label">templates.ts</text>
+                    <text x="280" y="107" text-anchor="middle" class="text-small">(Templates)</text>
+
+                    <rect x="400" y="70" width="120" height="50" rx="3" class="box-inner"/>
+                    <text x="460" y="92" text-anchor="middle" class="text-label">Project</text>
+                    <text x="460" y="107" text-anchor="middle" class="text-small">Files</text>
+
+                    <!-- Arrows between top boxes -->
+                    <line x1="160" y1="95" x2="215" y2="95" class="arrow"/>
+                    <polygon points="220,95 210,90 210,100" class="arrow-head"/>
+
+                    <line x1="340" y1="95" x2="395" y2="95" class="arrow"/>
+                    <polygon points="400,95 390,90 390,100" class="arrow-head"/>
+
+                    <!-- Arrow down from generate.ts -->
+                    <line x1="100" y1="120" x2="100" y2="155" class="arrow"/>
+                    <polygon points="100,160 95,150 105,150" class="arrow-head"/>
+
+                    <!-- Generated Project box -->
+                    <rect x="40" y="160" width="620" height="230" rx="5" class="box-inner"/>
+                    <text x="350" y="185" text-anchor="middle" class="text-title">Generated Project</text>
+
+                    <!-- Inner boxes: build.ts, cmake-file-api.ts, cmake-types.ts -->
+                    <rect x="60" y="200" width="110" height="50" rx="3" class="box-nested"/>
+                    <text x="115" y="230" text-anchor="middle" class="text-label">build.ts</text>
+
+                    <rect x="190" y="200" width="130" height="50" rx="3" class="box-nested"/>
+                    <text x="255" y="222" text-anchor="middle" class="text-label">cmake-</text>
+                    <text x="255" y="237" text-anchor="middle" class="text-label">file-api.ts</text>
+
+                    <rect x="340" y="200" width="110" height="50" rx="3" class="box-nested"/>
+                    <text x="395" y="222" text-anchor="middle" class="text-label">cmake-</text>
+                    <text x="395" y="237" text-anchor="middle" class="text-label">types.ts</text>
+
+                    <!-- Arrows down to CMake -->
+                    <line x1="115" y1="250" x2="115" y2="285" class="arrow"/>
+                    <polygon points="115,290 110,280 120,280" class="arrow-head"/>
+
+                    <line x1="255" y1="250" x2="255" y2="285" class="arrow"/>
+                    <polygon points="255,290 250,280 260,280" class="arrow-head"/>
+
+                    <!-- CMake box -->
+                    <rect x="60" y="290" width="320" height="85" rx="3" class="box-nested"/>
+                    <text x="220" y="315" text-anchor="middle" class="text-label">CMake</text>
+
+                    <!-- File API v1 box inside CMake -->
+                    <rect x="80" y="325" width="280" height="35" rx="3" class="box-nested"/>
+                    <text x="220" y="348" text-anchor="middle" class="text-label">File API v1</text>
+                </svg>
             </div>
         </section>
 

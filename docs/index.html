@@ -14,21 +14,26 @@
             align-items: center;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: white;
+            padding: 40px 20px;
+            box-sizing: border-box;
         }
         .lang-select h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
+            text-align: center;
         }
         .lang-select .subtitle {
             font-size: 1.2rem;
             opacity: 0.8;
             margin-bottom: 50px;
+            text-align: center;
         }
         .lang-cards {
             display: flex;
             gap: 30px;
             flex-wrap: wrap;
             justify-content: center;
+            margin-bottom: 60px;
         }
         .lang-card {
             background: rgba(255, 255, 255, 0.1);
@@ -59,14 +64,36 @@
             opacity: 0.7;
         }
         .lang-select footer {
-            position: absolute;
-            bottom: 20px;
+            margin-top: auto;
             text-align: center;
             width: 100%;
             opacity: 0.7;
         }
         .lang-select footer a {
             color: #70c0ba;
+        }
+
+        @media (max-width: 600px) {
+            .lang-select h1 {
+                font-size: 1.6rem;
+            }
+            .lang-select .subtitle {
+                font-size: 1rem;
+                margin-bottom: 30px;
+            }
+            .lang-cards {
+                gap: 20px;
+                margin-bottom: 40px;
+            }
+            .lang-card {
+                padding: 30px 50px;
+            }
+            .lang-card .flag {
+                font-size: 3rem;
+            }
+            .lang-card .lang-name {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deno C++ Project Generator</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+    <header class="hero">
+        <div class="container">
+            <h1>Deno C++ Project Generator</h1>
+            <p class="tagline">Generate C++/CMake projects with a single URL</p>
+            <div class="hero-buttons">
+                <a href="#quick-start" class="btn btn-primary">Quick Start</a>
+                <a href="https://github.com/COx2/deno-advent-calender-2025" class="btn btn-secondary">GitHub</a>
+            </div>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="container">
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="usage.html">Usage</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li class="lang-switcher"><a href="../ja/index.html">JP</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>
+                This tool is a C++/CMake project generator that leverages Deno's URL execution feature.
+                Simply run <code>deno run</code> with a URL to generate a ready-to-use C++ project.
+            </p>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3>No Installation Required</h3>
+                    <p>With Deno installed, you can run directly from a URL. No tool installation or configuration needed.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📦</div>
+                    <h3>Ready-to-Use Template</h3>
+                    <p>Generates CMake, Deno build scripts, and C++ source files all set up and ready to go.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3>Type-Safe Build System</h3>
+                    <p>TypeScript-based build scripts provide type-safe build automation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Cross-Platform</h3>
+                    <p>The same scripts work on Windows, macOS, and Linux.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="quick-start">
+            <h2>Quick Start</h2>
+
+            <h3>Step 1: Install Deno</h3>
+            <p>If you haven't installed Deno yet:</p>
+
+            <div class="code-tabs">
+                <button class="tab-btn active" data-tab="mac">macOS/Linux</button>
+                <button class="tab-btn" data-tab="win">Windows</button>
+            </div>
+            <div class="tab-content active" id="mac">
+                <pre><code class="language-bash">curl -fsSL https://deno.land/install.sh | sh</code></pre>
+            </div>
+            <div class="tab-content" id="win">
+                <pre><code class="language-powershell">irm https://deno.land/install.ps1 | iex</code></pre>
+            </div>
+
+            <h3>Step 2: Generate a Project</h3>
+            <pre><code class="language-bash">deno run --allow-read --allow-write --allow-run \
+  https://raw.githubusercontent.com/COx2/deno-advent-calender-2025/main/generator/generate.ts \
+  --name "MyProject" --author "Your Name" --with-git</code></pre>
+
+            <h3>Step 3: Build & Run</h3>
+            <pre><code class="language-bash">cd myproject
+deno task build
+deno task test</code></pre>
+
+            <div class="output-example">
+                <h4>Example Output</h4>
+                <pre><code>====================
+| MyProject Calculator |
+====================
+Version: 1.0.0
+
+10 + 5 = 15
+10 x 5 = 50</code></pre>
+            </div>
+        </section>
+
+        <section id="generated-structure">
+            <h2>Generated Project Structure</h2>
+            <pre><code class="language-text">myproject/
+├── src/
+│   ├── main.cpp           # Main application
+│   ├── core/              # Static library (myproject_core)
+│   │   ├── core.h
+│   │   └── core.cpp
+│   └── utils/             # Shared library (myproject_utils)
+│       ├── utils.h
+│       └── utils.cpp
+├── CMakeLists.txt         # CMake configuration
+├── build.ts               # Main build script
+├── build.config.ts        # Build configuration
+├── cmake-file-api.ts      # CMake File API integration
+├── cmake-types.ts         # TypeScript type definitions
+├── deno.json              # Deno tasks configuration
+└── .gitignore</code></pre>
+        </section>
+
+        <section id="why-deno">
+            <h2>Why Deno?</h2>
+
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Traditional Shell Scripts</th>
+                            <th>Deno + TypeScript</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Type Safety</td>
+                            <td>None</td>
+                            <td>Full TypeScript type checking</td>
+                        </tr>
+                        <tr>
+                            <td>Cross-Platform</td>
+                            <td>Bash scripts don't work on Windows</td>
+                            <td>Same code on any OS</td>
+                        </tr>
+                        <tr>
+                            <td>Dependency Management</td>
+                            <td>Manual management</td>
+                            <td>Automatic resolution via URL imports</td>
+                        </tr>
+                        <tr>
+                            <td>IDE Support</td>
+                            <td>Limited</td>
+                            <td>Full VSCode support</td>
+                        </tr>
+                        <tr>
+                            <td>Security</td>
+                            <td>All commands can execute</td>
+                            <td>Explicit permissions required</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="technologies">
+            <h2>Technologies Used</h2>
+            <ul class="tech-list">
+                <li>
+                    <strong>Deno</strong> - A secure TypeScript/JavaScript runtime
+                    <a href="https://deno.land/">deno.land</a>
+                </li>
+                <li>
+                    <strong>dax</strong> - Cross-platform shell tools for Deno
+                    <a href="https://jsr.io/@david/dax">jsr.io/@david/dax</a>
+                </li>
+                <li>
+                    <strong>CMake</strong> - Cross-platform build system
+                    <a href="https://cmake.org/">cmake.org</a>
+                </li>
+                <li>
+                    <strong>CMake File API</strong> - Programmatic access to build information
+                    <a href="https://cmake.org/cmake/help/latest/manual/cmake-file-api.7.html">Documentation</a>
+                </li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>
+                Created for <a href="https://qiita.com/advent-calendar/2025/deno">Deno Advent Calendar 2025</a>
+            </p>
+            <p>
+                <a href="https://github.com/COx2/deno-advent-calender-2025">GitHub Repository</a> |
+                MIT License
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-powershell.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script>
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

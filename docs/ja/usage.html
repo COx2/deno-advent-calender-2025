@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使い方 - Deno C++ Project Generator</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+    <header class="page-header">
+        <div class="container">
+            <h1>使い方ガイド</h1>
+            <p>ジェネレータの使い方と生成されたプロジェクトの操作方法</p>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="usage.html" class="active">Usage</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li class="lang-switcher"><a href="../en/usage.html">EN</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="generator-options">
+            <h2>ジェネレータオプション</h2>
+            <p>ジェネレータは以下のオプションを受け付けます：</p>
+
+            <table class="options-table">
+                <thead>
+                    <tr>
+                        <th>オプション</th>
+                        <th>短縮形</th>
+                        <th>デフォルト</th>
+                        <th>説明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>--name</code></td>
+                        <td><code>-n</code></td>
+                        <td>"MyApp"</td>
+                        <td>プロジェクト名</td>
+                    </tr>
+                    <tr>
+                        <td><code>--author</code></td>
+                        <td><code>-a</code></td>
+                        <td>"Your Name"</td>
+                        <td>作者名</td>
+                    </tr>
+                    <tr>
+                        <td><code>--version</code></td>
+                        <td><code>-v</code></td>
+                        <td>"1.0.0"</td>
+                        <td>バージョン</td>
+                    </tr>
+                    <tr>
+                        <td><code>--output</code></td>
+                        <td><code>-o</code></td>
+                        <td>プロジェクト名から生成</td>
+                        <td>出力ディレクトリ</td>
+                    </tr>
+                    <tr>
+                        <td><code>--with-git</code></td>
+                        <td>-</td>
+                        <td>false</td>
+                        <td>Gitリポジトリを初期化</td>
+                    </tr>
+                    <tr>
+                        <td><code>--help</code></td>
+                        <td><code>-h</code></td>
+                        <td>-</td>
+                        <td>ヘルプを表示</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>使用例</h3>
+
+            <h4>基本的な使用方法</h4>
+            <pre><code class="language-bash"># デフォルト設定で生成
+deno run --allow-read --allow-write --allow-run \
+  https://raw.githubusercontent.com/COx2/deno-advent-calender-2025/main/generator/generate.ts</code></pre>
+
+            <h4>カスタム設定</h4>
+            <pre><code class="language-bash"># すべてのオプションを指定
+deno run --allow-read --allow-write --allow-run \
+  https://raw.githubusercontent.com/COx2/deno-advent-calender-2025/main/generator/generate.ts \
+  --name "GameEngine" \
+  --author "John Doe" \
+  --version "0.1.0" \
+  --output ./my-game-engine \
+  --with-git</code></pre>
+
+            <h4>短縮形オプション</h4>
+            <pre><code class="language-bash">deno run --allow-read --allow-write --allow-run \
+  https://raw.githubusercontent.com/COx2/deno-advent-calender-2025/main/generator/generate.ts \
+  -n "MyLib" -a "Developer" -o ./mylib</code></pre>
+        </section>
+
+        <section id="build-commands">
+            <h2>ビルドコマンド</h2>
+            <p>生成されたプロジェクトでは、以下のDenoタスクが使用できます：</p>
+
+            <h3>ビルドコマンド</h3>
+            <table class="options-table">
+                <thead>
+                    <tr>
+                        <th>コマンド</th>
+                        <th>説明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>deno task build</code></td>
+                        <td>Releaseモードでビルド</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task build:debug</code></td>
+                        <td>Debugモードでビルド</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task build:release</code></td>
+                        <td>Releaseモードでビルド（明示的）</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task clean</code></td>
+                        <td>ビルドディレクトリを削除</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task rebuild</code></td>
+                        <td>クリーン後にリビルド</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task test</code></td>
+                        <td>ビルド後に実行ファイルを実行</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>開発コマンド</h3>
+            <table class="options-table">
+                <thead>
+                    <tr>
+                        <th>コマンド</th>
+                        <th>説明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>deno task format</code></td>
+                        <td>TypeScriptファイルをフォーマット</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task format:check</code></td>
+                        <td>フォーマットをチェック</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task lint</code></td>
+                        <td>TypeScriptファイルをLint</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="build-script-options">
+            <h2>ビルドスクリプトオプション</h2>
+            <p>ビルドスクリプトを直接実行する場合の追加オプション：</p>
+
+            <pre><code class="language-bash"># クリーンのみ
+deno run --allow-all ./build.ts --clean
+
+# Debugビルド
+deno run --allow-all ./build.ts --config Debug
+
+# ビルド後にテスト実行
+deno run --allow-all ./build.ts --test
+
+# Ninjaジェネレータを使用（インストールされている場合）
+deno run --allow-all ./build.ts --generator Ninja</code></pre>
+
+            <div class="note">
+                <strong>Note (Windows):</strong>
+                Windowsではデフォルトで "Visual Studio 17 2022" ジェネレータが使用されます。
+                Ninjaがインストールされている場合は <code>--generator Ninja</code> で高速なビルドが可能です。
+            </div>
+        </section>
+
+        <section id="build-outputs">
+            <h2>ビルド出力</h2>
+            <p>ビルドすると以下のターゲットが生成されます：</p>
+
+            <div class="target-cards">
+                <div class="target-card">
+                    <h3>静的ライブラリ</h3>
+                    <p class="target-name">[project]_core</p>
+                    <p>計算機能などのコア機能を提供</p>
+                    <ul>
+                        <li>Windows: <code>build/Release/[project]_core.lib</code></li>
+                        <li>Unix: <code>build/lib/lib[project]_core.a</code></li>
+                    </ul>
+                </div>
+
+                <div class="target-card">
+                    <h3>共有ライブラリ</h3>
+                    <p class="target-name">[project]_utils</p>
+                    <p>ユーティリティ関数を提供</p>
+                    <ul>
+                        <li>Windows: <code>build/Release/[project]_utils.dll</code></li>
+                        <li>macOS: <code>build/lib/lib[project]_utils.dylib</code></li>
+                        <li>Linux: <code>build/lib/lib[project]_utils.so</code></li>
+                    </ul>
+                </div>
+
+                <div class="target-card">
+                    <h3>実行ファイル</h3>
+                    <p class="target-name">[project]</p>
+                    <p>両方のライブラリを使用するメインアプリケーション</p>
+                    <ul>
+                        <li>Windows: <code>build/Release/[project].exe</code></li>
+                        <li>Unix: <code>build/bin/[project]</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>ディレクトリ構造の違い</h3>
+
+            <div class="code-tabs">
+                <button class="tab-btn active" data-tab="vs">Visual Studio (Windows)</button>
+                <button class="tab-btn" data-tab="unix">Unix Makefiles</button>
+            </div>
+            <div class="tab-content active" id="vs">
+                <pre><code class="language-text">build/
+├── Release/              # Releaseビルド成果物
+│   ├── myapp.exe
+│   ├── myapp_core.lib
+│   ├── myapp_utils.dll
+│   ├── myapp_utils.lib   # インポートライブラリ
+│   └── myapp_utils.exp
+└── Debug/                # Debugビルド成果物
+    └── ...</code></pre>
+            </div>
+            <div class="tab-content" id="unix">
+                <pre><code class="language-text">build/
+├── bin/                  # 実行ファイル
+│   └── myapp
+└── lib/                  # ライブラリ
+    ├── libmyapp_core.a
+    └── libmyapp_utils.so (or .dylib)</code></pre>
+            </div>
+        </section>
+
+        <section id="customization">
+            <h2>カスタマイズ</h2>
+
+            <h3>ビルド設定の変更</h3>
+            <p><code>build.config.ts</code> を編集してプロジェクト設定を変更できます：</p>
+            <pre><code class="language-typescript">export const config: BuildConfig = {
+  projectName: "MyApp",
+  version: "1.0.0",
+  author: "Your Name",
+  buildTypes: ["Debug", "Release"],
+};</code></pre>
+
+            <h3>CMake設定の変更</h3>
+            <p><code>CMakeLists.txt</code> を編集して、ライブラリの追加や設定の変更が可能です。</p>
+
+            <h3>新しいソースファイルの追加</h3>
+            <ol>
+                <li><code>src/</code> 以下に新しいファイルを作成</li>
+                <li><code>CMakeLists.txt</code> の該当ターゲットにファイルを追加</li>
+                <li><code>deno task rebuild</code> でリビルド</li>
+            </ol>
+        </section>
+
+        <section id="troubleshooting">
+            <h2>トラブルシューティング</h2>
+
+            <div class="faq">
+                <div class="faq-item">
+                    <h4>CMake not found</h4>
+                    <p>CMakeがインストールされていることを確認してください：</p>
+                    <pre><code class="language-bash">cmake --version</code></pre>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Deno permission errors</h4>
+                    <p>ビルドスクリプトには適切な権限が必要です：</p>
+                    <pre><code class="language-bash">deno run --allow-all build.ts</code></pre>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Build errors</h4>
+                    <p>ビルドディレクトリをクリーンしてから再試行：</p>
+                    <pre><code class="language-bash">deno task clean
+deno task build</code></pre>
+                </div>
+
+                <div class="faq-item">
+                    <h4>DLL not found (Windows)</h4>
+                    <p>実行ファイルとDLLは同じディレクトリに配置されます。
+                       実行ファイルを移動する場合は、DLLも一緒にコピーしてください。</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>
+                Created for <a href="https://qiita.com/advent-calendar/2025/deno">Deno Advent Calendar 2025</a>
+            </p>
+            <p>
+                <a href="https://github.com/COx2/deno-advent-calender-2025">GitHub Repository</a> |
+                MIT License
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script>
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+# GitHub Pages Configuration
+title: Deno C++ Project Generator
+description: Deno script to generate C++/CMake projects with a one-line URL
+baseurl: "/deno-advent-calender-2025"
+url: "https://cox2.github.io"
+
+# Theme (optional - we're using custom HTML/CSS)
+# theme: jekyll-theme-minimal
+
+# Exclude files from build
+exclude:
+  - README.md
+  - LICENSE
+  - .gitignore

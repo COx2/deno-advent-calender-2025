@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アーキテクチャ - Deno C++ Project Generator</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+    <header class="page-header">
+        <div class="container">
+            <h1>アーキテクチャ</h1>
+            <p>ジェネレータとビルドシステムの技術的な解説</p>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="usage.html">Usage</a></li>
+                <li><a href="architecture.html" class="active">Architecture</a></li>
+                <li class="lang-switcher"><a href="../en/architecture.html">EN</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="overview">
+            <h2>システム概要</h2>
+
+            <div class="architecture-diagram">
+                <pre class="diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│                     Deno Runtime                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
+│  │ generate.ts  │───▶│ templates.ts │───▶│ Project      │      │
+│  │ (Entry)      │    │ (Templates)  │    │ Files        │      │
+│  └──────────────┘    └──────────────┘    └──────────────┘      │
+│         │                                                        │
+│         ▼                                                        │
+│  ┌──────────────────────────────────────────────────────┐       │
+│  │                  Generated Project                     │       │
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐      │       │
+│  │  │ build.ts   │  │ cmake-     │  │ cmake-     │      │       │
+│  │  │            │  │ file-api.ts│  │ types.ts   │      │       │
+│  │  └─────┬──────┘  └─────┬──────┘  └────────────┘      │       │
+│  │        │               │                               │       │
+│  │        ▼               ▼                               │       │
+│  │  ┌──────────────────────────┐                         │       │
+│  │  │         CMake            │                         │       │
+│  │  │  ┌──────────────────┐   │                         │       │
+│  │  │  │  File API v1     │   │                         │       │
+│  │  │  └──────────────────┘   │                         │       │
+│  │  └──────────────────────────┘                         │       │
+│  └──────────────────────────────────────────────────────┘       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+                </pre>
+            </div>
+        </section>
+
+        <section id="generator">
+            <h2>ジェネレータアーキテクチャ</h2>
+
+            <h3>generate.ts - エントリーポイント</h3>
+            <p>ジェネレータのメインファイルです。コマンドライン引数を解析し、プロジェクト生成を制御します。</p>
+
+            <pre><code class="language-typescript">// コマンドライン引数の解析
+const args = parseArgs(Deno.args, {
+  boolean: ["help", "with-git"],
+  string: ["name", "author", "version", "output"],
+  default: {
+    name: "MyApp",
+    author: "Your Name",
+    version: "1.0.0",
+  },
+});
+
+// プロジェクト設定の構築
+const config: ProjectConfig = {
+  name: projectName,
+  nameLower: toSnakeCase(projectName),
+  nameUpper: nameLower.toUpperCase(),
+  author: args.author,
+  version: args.version,
+  outputDir: args.output || projectName.toLowerCase(),
+  withGit: args["with-git"],
+};</code></pre>
+
+            <h3>templates.ts - テンプレート生成</h3>
+            <p>各ファイルのテンプレートを生成する関数群です。プロジェクト設定に基づいて動的にコンテンツを生成します。</p>
+
+            <pre><code class="language-typescript">// CMakeLists.txt の生成例
+export function generateCMakeLists(config: ProjectConfig): string {
+  return `cmake_minimum_required(VERSION 3.15)
+project(${config.name} VERSION ${config.version} LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+...
+`;
+}</code></pre>
+
+            <h3>Deno URL実行の仕組み</h3>
+            <p>
+                Denoは <code>deno run &lt;url&gt;</code> でリモートのTypeScriptを直接実行できます。
+                これにより、ユーザーはツールをインストールせずにジェネレータを使用できます。
+            </p>
+
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>URL指定で実行</h4>
+                        <code>deno run https://...generate.ts</code>
+                    </div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>自動ダウンロード</h4>
+                        <p>Denoがスクリプトと依存関係をダウンロード</p>
+                    </div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>ローカル実行</h4>
+                        <p>ローカルファイルシステムにプロジェクト生成</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="build-system">
+            <h2>ビルドシステムアーキテクチャ</h2>
+
+            <h3>build.ts - ビルドスクリプト</h3>
+            <p>Denoとdaxを使用したクロスプラットフォームビルドスクリプトです。</p>
+
+            <pre><code class="language-typescript">import $ from "jsr:@david/dax@0.42.0";
+
+// CMake設定
+async function configure(): Promise&lt;void&gt; {
+  await $`mkdir -p build`;
+  await setupFileAPI("build");
+  await $`cmake -B build -DCMAKE_BUILD_TYPE=${args.config}`;
+}
+
+// ビルド実行
+async function build(): Promise&lt;BuildArtifact[]&gt; {
+  await $`cmake --build build --config ${args.config}`;
+  const artifacts = await parseFileAPI("build");
+  return artifacts;
+}</code></pre>
+
+            <h3>dax の特徴</h3>
+            <ul class="feature-list">
+                <li>
+                    <strong>クロスプラットフォーム</strong>
+                    - <code>$`mkdir -p`</code> がWindowsでも動作
+                </li>
+                <li>
+                    <strong>テンプレートリテラル</strong>
+                    - 変数の安全な埋め込み
+                </li>
+                <li>
+                    <strong>エラーハンドリング</strong>
+                    - コマンド失敗時の自動例外スロー
+                </li>
+                <li>
+                    <strong>パイプ・リダイレクト</strong>
+                    - シェルライクな操作が可能
+                </li>
+            </ul>
+        </section>
+
+        <section id="cmake-file-api">
+            <h2>CMake File API連携</h2>
+
+            <p>
+                CMake File API v1 を使用して、ビルド成果物の情報をプログラマティックに取得します。
+                これにより、ハードコードされたパスに依存せず、プラットフォームやジェネレータに応じた
+                正しいパスを自動検出できます。
+            </p>
+
+            <h3>仕組み</h3>
+            <div class="api-flow">
+                <div class="api-step">
+                    <h4>1. Query作成</h4>
+                    <p><code>build/.cmake/api/v1/query/codemodel-v2</code> に空ファイルを作成</p>
+                </div>
+                <div class="api-step">
+                    <h4>2. CMake実行</h4>
+                    <p>CMake設定時にQueryを検出し、Replyを生成</p>
+                </div>
+                <div class="api-step">
+                    <h4>3. Reply解析</h4>
+                    <p><code>build/.cmake/api/v1/reply/</code> のJSONファイルをパース</p>
+                </div>
+            </div>
+
+            <h3>Reply構造</h3>
+            <pre><code class="language-typescript">// cmake-types.ts より
+interface FileAPIIndex {
+  cmake: { version: {...} };
+  objects: Array&lt;{ kind: string; jsonFile: string; }&gt;;
+  reply: {
+    [key: string]: { kind: string; jsonFile: string; };
+  };
+}
+
+interface CodeModelV2 {
+  paths: { source: string; build: string; };
+  configurations: Array&lt;{
+    name: string;
+    targets: Array&lt;{ name: string; jsonFile: string; }&gt;;
+  }&gt;;
+}
+
+interface TargetInfo {
+  name: string;
+  type: "EXECUTABLE" | "STATIC_LIBRARY" | "SHARED_LIBRARY";
+  artifacts?: Array&lt;{ path: string; }&gt;;
+}</code></pre>
+
+            <h3>利点</h3>
+            <ul>
+                <li>Visual Studio / Unix Makefiles / Ninja など、どのジェネレータでも動作</li>
+                <li>Debug / Release などのビルドタイプを自動認識</li>
+                <li>生成されたすべてのターゲット（実行ファイル、ライブラリ）を自動検出</li>
+            </ul>
+        </section>
+
+        <section id="cpp-structure">
+            <h2>C++プロジェクト構造</h2>
+
+            <h3>ターゲット構成</h3>
+            <div class="cpp-targets">
+                <div class="cpp-target">
+                    <h4>静的ライブラリ: [project]_core</h4>
+                    <pre><code class="language-cmake">add_library(myapp_core STATIC
+    src/core/core.cpp
+    src/core/core.h
+)</code></pre>
+                    <p>内部リンク用の静的ライブラリ。バイナリに直接リンクされます。</p>
+                </div>
+
+                <div class="cpp-target">
+                    <h4>共有ライブラリ: [project]_utils</h4>
+                    <pre><code class="language-cmake">add_library(myapp_utils SHARED
+    src/utils/utils.cpp
+    src/utils/utils.h
+)
+target_compile_definitions(myapp_utils
+    PRIVATE MYAPP_UTILS_EXPORTS)</code></pre>
+                    <p>動的リンクライブラリ。Windows DLLエクスポートマクロを含みます。</p>
+                </div>
+
+                <div class="cpp-target">
+                    <h4>実行ファイル: [project]</h4>
+                    <pre><code class="language-cmake">add_executable(myapp src/main.cpp)
+target_link_libraries(myapp PRIVATE
+    myapp_core
+    myapp_utils
+)</code></pre>
+                    <p>両方のライブラリを使用するメインアプリケーション。</p>
+                </div>
+            </div>
+
+            <h3>Windows DLLエクスポート</h3>
+            <p>Windows環境では、共有ライブラリのシンボルを適切にエクスポート/インポートする必要があります：</p>
+
+            <pre><code class="language-cpp">// utils.h
+#ifdef _WIN32
+    #ifdef MYAPP_UTILS_EXPORTS
+        #define MYAPP_UTILS_API __declspec(dllexport)
+    #else
+        #define MYAPP_UTILS_API __declspec(dllimport)
+    #endif
+#else
+    #define MYAPP_UTILS_API
+#endif
+
+MYAPP_UTILS_API void myFunction();</code></pre>
+        </section>
+
+        <section id="dependencies">
+            <h2>依存関係</h2>
+
+            <table class="deps-table">
+                <thead>
+                    <tr>
+                        <th>パッケージ</th>
+                        <th>バージョン</th>
+                        <th>用途</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="https://jsr.io/@david/dax">@david/dax</a></td>
+                        <td>0.42.0</td>
+                        <td>クロスプラットフォームシェルコマンド実行</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://jsr.io/@std/cli">@std/cli</a></td>
+                        <td>1.0.6</td>
+                        <td>コマンドライン引数解析</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://jsr.io/@std/path">@std/path</a></td>
+                        <td>1.0.8</td>
+                        <td>パス操作</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://jsr.io/@std/fs">@std/fs</a></td>
+                        <td>1.0.8</td>
+                        <td>ファイルシステム操作</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                すべての依存関係は <a href="https://jsr.io/">JSR (JavaScript Registry)</a> から取得されます。
+                Denoは実行時に自動的にダウンロード・キャッシュします。
+            </p>
+        </section>
+
+        <section id="security">
+            <h2>セキュリティモデル</h2>
+
+            <p>Denoはデフォルトでセキュアです。ジェネレータは必要最小限の権限のみを要求します：</p>
+
+            <table class="permissions-table">
+                <thead>
+                    <tr>
+                        <th>権限</th>
+                        <th>フラグ</th>
+                        <th>用途</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ファイル読み取り</td>
+                        <td><code>--allow-read</code></td>
+                        <td>既存ディレクトリの確認</td>
+                    </tr>
+                    <tr>
+                        <td>ファイル書き込み</td>
+                        <td><code>--allow-write</code></td>
+                        <td>プロジェクトファイルの生成</td>
+                    </tr>
+                    <tr>
+                        <td>コマンド実行</td>
+                        <td><code>--allow-run</code></td>
+                        <td>git init の実行（オプション）</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="note">
+                <strong>Note:</strong>
+                生成されたプロジェクトの <code>build.ts</code> は <code>--allow-all</code> を使用します。
+                これはCMakeやコンパイラの実行に必要な権限を包括的に付与するためです。
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>
+                Created for <a href="https://qiita.com/advent-calendar/2025/deno">Deno Advent Calendar 2025</a>
+            </p>
+            <p>
+                <a href="https://github.com/COx2/deno-advent-calender-2025">GitHub Repository</a> |
+                MIT License
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+</body>
+</html>

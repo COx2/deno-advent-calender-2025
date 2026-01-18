@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture - Deno C++ Project Generator</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+    <header class="page-header">
+        <div class="container">
+            <h1>Architecture</h1>
+            <p>Technical details of the generator and build system</p>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="usage.html">Usage</a></li>
+                <li><a href="architecture.html" class="active">Architecture</a></li>
+                <li class="lang-switcher"><a href="../ja/architecture.html">JP</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="overview">
+            <h2>System Overview</h2>
+
+            <div class="architecture-diagram">
+                <pre class="diagram">
+┌─────────────────────────────────────────────────────────────────┐
+│                     Deno Runtime                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐      │
+│  │ generate.ts  │───▶│ templates.ts │───▶│ Project      │      │
+│  │ (Entry)      │    │ (Templates)  │    │ Files        │      │
+│  └──────────────┘    └──────────────┘    └──────────────┘      │
+│         │                                                        │
+│         ▼                                                        │
+│  ┌──────────────────────────────────────────────────────┐       │
+│  │                  Generated Project                     │       │
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐      │       │
+│  │  │ build.ts   │  │ cmake-     │  │ cmake-     │      │       │
+│  │  │            │  │ file-api.ts│  │ types.ts   │      │       │
+│  │  └─────┬──────┘  └─────┬──────┘  └────────────┘      │       │
+│  │        │               │                               │       │
+│  │        ▼               ▼                               │       │
+│  │  ┌──────────────────────────┐                         │       │
+│  │  │         CMake            │                         │       │
+│  │  │  ┌──────────────────┐   │                         │       │
+│  │  │  │  File API v1     │   │                         │       │
+│  │  │  └──────────────────┘   │                         │       │
+│  │  └──────────────────────────┘                         │       │
+│  └──────────────────────────────────────────────────────┘       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+                </pre>
+            </div>
+        </section>
+
+        <section id="generator">
+            <h2>Generator Architecture</h2>
+
+            <h3>generate.ts - Entry Point</h3>
+            <p>The main generator file. Parses command-line arguments and controls project generation.</p>
+
+            <pre><code class="language-typescript">// Parse command-line arguments
+const args = parseArgs(Deno.args, {
+  boolean: ["help", "with-git"],
+  string: ["name", "author", "version", "output"],
+  default: {
+    name: "MyApp",
+    author: "Your Name",
+    version: "1.0.0",
+  },
+});
+
+// Build project configuration
+const config: ProjectConfig = {
+  name: projectName,
+  nameLower: toSnakeCase(projectName),
+  nameUpper: nameLower.toUpperCase(),
+  author: args.author,
+  version: args.version,
+  outputDir: args.output || projectName.toLowerCase(),
+  withGit: args["with-git"],
+};</code></pre>
+
+            <h3>templates.ts - Template Generation</h3>
+            <p>Functions that generate templates for each file. Dynamically generates content based on project configuration.</p>
+
+            <pre><code class="language-typescript">// Example: CMakeLists.txt generation
+export function generateCMakeLists(config: ProjectConfig): string {
+  return `cmake_minimum_required(VERSION 3.15)
+project(${config.name} VERSION ${config.version} LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+...
+`;
+}</code></pre>
+
+            <h3>How Deno URL Execution Works</h3>
+            <p>
+                Deno can execute remote TypeScript directly with <code>deno run &lt;url&gt;</code>.
+                This allows users to use the generator without installing any tools.
+            </p>
+
+            <div class="flow-diagram">
+                <div class="flow-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Run with URL</h4>
+                        <code>deno run https://...generate.ts</code>
+                    </div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Auto Download</h4>
+                        <p>Deno downloads script and dependencies</p>
+                    </div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div class="flow-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Local Execution</h4>
+                        <p>Generates project on local filesystem</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="build-system">
+            <h2>Build System Architecture</h2>
+
+            <h3>build.ts - Build Script</h3>
+            <p>Cross-platform build script using Deno and dax.</p>
+
+            <pre><code class="language-typescript">import $ from "jsr:@david/dax@0.42.0";
+
+// CMake configuration
+async function configure(): Promise&lt;void&gt; {
+  await $`mkdir -p build`;
+  await setupFileAPI("build");
+  await $`cmake -B build -DCMAKE_BUILD_TYPE=${args.config}`;
+}
+
+// Build execution
+async function build(): Promise&lt;BuildArtifact[]&gt; {
+  await $`cmake --build build --config ${args.config}`;
+  const artifacts = await parseFileAPI("build");
+  return artifacts;
+}</code></pre>
+
+            <h3>Features of dax</h3>
+            <ul class="feature-list">
+                <li>
+                    <strong>Cross-Platform</strong>
+                    - <code>$`mkdir -p`</code> works on Windows too
+                </li>
+                <li>
+                    <strong>Template Literals</strong>
+                    - Safe variable interpolation
+                </li>
+                <li>
+                    <strong>Error Handling</strong>
+                    - Automatic exception throwing on command failure
+                </li>
+                <li>
+                    <strong>Pipes & Redirects</strong>
+                    - Shell-like operations possible
+                </li>
+            </ul>
+        </section>
+
+        <section id="cmake-file-api">
+            <h2>CMake File API Integration</h2>
+
+            <p>
+                Uses CMake File API v1 to programmatically retrieve build artifact information.
+                This enables automatic detection of correct paths regardless of platform or generator,
+                without relying on hardcoded paths.
+            </p>
+
+            <h3>How It Works</h3>
+            <div class="api-flow">
+                <div class="api-step">
+                    <h4>1. Create Query</h4>
+                    <p>Create empty file at <code>build/.cmake/api/v1/query/codemodel-v2</code></p>
+                </div>
+                <div class="api-step">
+                    <h4>2. Run CMake</h4>
+                    <p>CMake detects query during configuration and generates reply</p>
+                </div>
+                <div class="api-step">
+                    <h4>3. Parse Reply</h4>
+                    <p>Parse JSON files in <code>build/.cmake/api/v1/reply/</code></p>
+                </div>
+            </div>
+
+            <h3>Reply Structure</h3>
+            <pre><code class="language-typescript">// From cmake-types.ts
+interface FileAPIIndex {
+  cmake: { version: {...} };
+  objects: Array&lt;{ kind: string; jsonFile: string; }&gt;;
+  reply: {
+    [key: string]: { kind: string; jsonFile: string; };
+  };
+}
+
+interface CodeModelV2 {
+  paths: { source: string; build: string; };
+  configurations: Array&lt;{
+    name: string;
+    targets: Array&lt;{ name: string; jsonFile: string; }&gt;;
+  }&gt;;
+}
+
+interface TargetInfo {
+  name: string;
+  type: "EXECUTABLE" | "STATIC_LIBRARY" | "SHARED_LIBRARY";
+  artifacts?: Array&lt;{ path: string; }&gt;;
+}</code></pre>
+
+            <h3>Benefits</h3>
+            <ul>
+                <li>Works with any generator: Visual Studio, Unix Makefiles, Ninja, etc.</li>
+                <li>Automatically recognizes build types like Debug/Release</li>
+                <li>Auto-detects all generated targets (executables, libraries)</li>
+            </ul>
+        </section>
+
+        <section id="cpp-structure">
+            <h2>C++ Project Structure</h2>
+
+            <h3>Target Configuration</h3>
+            <div class="cpp-targets">
+                <div class="cpp-target">
+                    <h4>Static Library: [project]_core</h4>
+                    <pre><code class="language-cmake">add_library(myapp_core STATIC
+    src/core/core.cpp
+    src/core/core.h
+)</code></pre>
+                    <p>Static library for internal linking. Linked directly into binaries.</p>
+                </div>
+
+                <div class="cpp-target">
+                    <h4>Shared Library: [project]_utils</h4>
+                    <pre><code class="language-cmake">add_library(myapp_utils SHARED
+    src/utils/utils.cpp
+    src/utils/utils.h
+)
+target_compile_definitions(myapp_utils
+    PRIVATE MYAPP_UTILS_EXPORTS)</code></pre>
+                    <p>Dynamic link library. Includes Windows DLL export macros.</p>
+                </div>
+
+                <div class="cpp-target">
+                    <h4>Executable: [project]</h4>
+                    <pre><code class="language-cmake">add_executable(myapp src/main.cpp)
+target_link_libraries(myapp PRIVATE
+    myapp_core
+    myapp_utils
+)</code></pre>
+                    <p>Main application using both libraries.</p>
+                </div>
+            </div>
+
+            <h3>Windows DLL Export</h3>
+            <p>On Windows, shared library symbols must be properly exported/imported:</p>
+
+            <pre><code class="language-cpp">// utils.h
+#ifdef _WIN32
+    #ifdef MYAPP_UTILS_EXPORTS
+        #define MYAPP_UTILS_API __declspec(dllexport)
+    #else
+        #define MYAPP_UTILS_API __declspec(dllimport)
+    #endif
+#else
+    #define MYAPP_UTILS_API
+#endif
+
+MYAPP_UTILS_API void myFunction();</code></pre>
+        </section>
+
+        <section id="dependencies">
+            <h2>Dependencies</h2>
+
+            <table class="deps-table">
+                <thead>
+                    <tr>
+                        <th>Package</th>
+                        <th>Version</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="https://jsr.io/@david/dax">@david/dax</a></td>
+                        <td>0.42.0</td>
+                        <td>Cross-platform shell command execution</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://jsr.io/@std/cli">@std/cli</a></td>
+                        <td>1.0.6</td>
+                        <td>Command-line argument parsing</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://jsr.io/@std/path">@std/path</a></td>
+                        <td>1.0.8</td>
+                        <td>Path manipulation</td>
+                    </tr>
+                    <tr>
+                        <td><a href="https://jsr.io/@std/fs">@std/fs</a></td>
+                        <td>1.0.8</td>
+                        <td>Filesystem operations</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                All dependencies are fetched from <a href="https://jsr.io/">JSR (JavaScript Registry)</a>.
+                Deno automatically downloads and caches them at runtime.
+            </p>
+        </section>
+
+        <section id="security">
+            <h2>Security Model</h2>
+
+            <p>Deno is secure by default. The generator only requests minimum necessary permissions:</p>
+
+            <table class="permissions-table">
+                <thead>
+                    <tr>
+                        <th>Permission</th>
+                        <th>Flag</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>File Read</td>
+                        <td><code>--allow-read</code></td>
+                        <td>Check existing directories</td>
+                    </tr>
+                    <tr>
+                        <td>File Write</td>
+                        <td><code>--allow-write</code></td>
+                        <td>Generate project files</td>
+                    </tr>
+                    <tr>
+                        <td>Command Execution</td>
+                        <td><code>--allow-run</code></td>
+                        <td>Run git init (optional)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="note">
+                <strong>Note:</strong>
+                The generated project's <code>build.ts</code> uses <code>--allow-all</code>.
+                This grants comprehensive permissions needed to run CMake and compilers.
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>
+                Created for <a href="https://qiita.com/advent-calendar/2025/deno">Deno Advent Calendar 2025</a>
+            </p>
+            <p>
+                <a href="https://github.com/COx2/deno-advent-calender-2025">GitHub Repository</a> |
+                MIT License
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+</body>
+</html>

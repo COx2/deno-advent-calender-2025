@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usage - Deno C++ Project Generator</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+    <header class="page-header">
+        <div class="container">
+            <h1>Usage Guide</h1>
+            <p>How to use the generator and work with generated projects</p>
+        </div>
+    </header>
+
+    <nav class="navbar">
+        <div class="container">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="usage.html" class="active">Usage</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li class="lang-switcher"><a href="../ja/usage.html">JP</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section id="generator-options">
+            <h2>Generator Options</h2>
+            <p>The generator accepts the following options:</p>
+
+            <table class="options-table">
+                <thead>
+                    <tr>
+                        <th>Option</th>
+                        <th>Short</th>
+                        <th>Default</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>--name</code></td>
+                        <td><code>-n</code></td>
+                        <td>"MyApp"</td>
+                        <td>Project name</td>
+                    </tr>
+                    <tr>
+                        <td><code>--author</code></td>
+                        <td><code>-a</code></td>
+                        <td>"Your Name"</td>
+                        <td>Author name</td>
+                    </tr>
+                    <tr>
+                        <td><code>--version</code></td>
+                        <td><code>-v</code></td>
+                        <td>"1.0.0"</td>
+                        <td>Version</td>
+                    </tr>
+                    <tr>
+                        <td><code>--output</code></td>
+                        <td><code>-o</code></td>
+                        <td>Generated from project name</td>
+                        <td>Output directory</td>
+                    </tr>
+                    <tr>
+                        <td><code>--with-git</code></td>
+                        <td>-</td>
+                        <td>false</td>
+                        <td>Initialize git repository</td>
+                    </tr>
+                    <tr>
+                        <td><code>--help</code></td>
+                        <td><code>-h</code></td>
+                        <td>-</td>
+                        <td>Show help</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Examples</h3>
+
+            <h4>Basic Usage</h4>
+            <pre><code class="language-bash"># Generate with default settings
+deno run --allow-read --allow-write --allow-run \
+  https://raw.githubusercontent.com/COx2/deno-advent-calender-2025/main/generator/generate.ts</code></pre>
+
+            <h4>Custom Settings</h4>
+            <pre><code class="language-bash"># Specify all options
+deno run --allow-read --allow-write --allow-run \
+  https://raw.githubusercontent.com/COx2/deno-advent-calender-2025/main/generator/generate.ts \
+  --name "GameEngine" \
+  --author "John Doe" \
+  --version "0.1.0" \
+  --output ./my-game-engine \
+  --with-git</code></pre>
+
+            <h4>Short Form Options</h4>
+            <pre><code class="language-bash">deno run --allow-read --allow-write --allow-run \
+  https://raw.githubusercontent.com/COx2/deno-advent-calender-2025/main/generator/generate.ts \
+  -n "MyLib" -a "Developer" -o ./mylib</code></pre>
+        </section>
+
+        <section id="build-commands">
+            <h2>Build Commands</h2>
+            <p>The generated project includes the following Deno tasks:</p>
+
+            <h3>Build Commands</h3>
+            <table class="options-table">
+                <thead>
+                    <tr>
+                        <th>Command</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>deno task build</code></td>
+                        <td>Build in Release mode</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task build:debug</code></td>
+                        <td>Build in Debug mode</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task build:release</code></td>
+                        <td>Build in Release mode (explicit)</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task clean</code></td>
+                        <td>Delete build directory</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task rebuild</code></td>
+                        <td>Clean and rebuild</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task test</code></td>
+                        <td>Build and run the executable</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Development Commands</h3>
+            <table class="options-table">
+                <thead>
+                    <tr>
+                        <th>Command</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>deno task format</code></td>
+                        <td>Format TypeScript files</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task format:check</code></td>
+                        <td>Check formatting</td>
+                    </tr>
+                    <tr>
+                        <td><code>deno task lint</code></td>
+                        <td>Lint TypeScript files</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="build-script-options">
+            <h2>Build Script Options</h2>
+            <p>Additional options when running the build script directly:</p>
+
+            <pre><code class="language-bash"># Clean only
+deno run --allow-all ./build.ts --clean
+
+# Debug build
+deno run --allow-all ./build.ts --config Debug
+
+# Build and test
+deno run --allow-all ./build.ts --test
+
+# Use Ninja generator (if installed)
+deno run --allow-all ./build.ts --generator Ninja</code></pre>
+
+            <div class="note">
+                <strong>Note (Windows):</strong>
+                On Windows, the default generator is "Visual Studio 17 2022".
+                If you have Ninja installed, use <code>--generator Ninja</code> for faster builds.
+            </div>
+        </section>
+
+        <section id="build-outputs">
+            <h2>Build Outputs</h2>
+            <p>Building generates the following targets:</p>
+
+            <div class="target-cards">
+                <div class="target-card">
+                    <h3>Static Library</h3>
+                    <p class="target-name">[project]_core</p>
+                    <p>Provides core functionality like calculations</p>
+                    <ul>
+                        <li>Windows: <code>build/Release/[project]_core.lib</code></li>
+                        <li>Unix: <code>build/lib/lib[project]_core.a</code></li>
+                    </ul>
+                </div>
+
+                <div class="target-card">
+                    <h3>Shared Library</h3>
+                    <p class="target-name">[project]_utils</p>
+                    <p>Provides utility functions</p>
+                    <ul>
+                        <li>Windows: <code>build/Release/[project]_utils.dll</code></li>
+                        <li>macOS: <code>build/lib/lib[project]_utils.dylib</code></li>
+                        <li>Linux: <code>build/lib/lib[project]_utils.so</code></li>
+                    </ul>
+                </div>
+
+                <div class="target-card">
+                    <h3>Executable</h3>
+                    <p class="target-name">[project]</p>
+                    <p>Main application using both libraries</p>
+                    <ul>
+                        <li>Windows: <code>build/Release/[project].exe</code></li>
+                        <li>Unix: <code>build/bin/[project]</code></li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Directory Structure Differences</h3>
+
+            <div class="code-tabs">
+                <button class="tab-btn active" data-tab="vs">Visual Studio (Windows)</button>
+                <button class="tab-btn" data-tab="unix">Unix Makefiles</button>
+            </div>
+            <div class="tab-content active" id="vs">
+                <pre><code class="language-text">build/
+├── Release/              # Release build artifacts
+│   ├── myapp.exe
+│   ├── myapp_core.lib
+│   ├── myapp_utils.dll
+│   ├── myapp_utils.lib   # Import library
+│   └── myapp_utils.exp
+└── Debug/                # Debug build artifacts
+    └── ...</code></pre>
+            </div>
+            <div class="tab-content" id="unix">
+                <pre><code class="language-text">build/
+├── bin/                  # Executables
+│   └── myapp
+└── lib/                  # Libraries
+    ├── libmyapp_core.a
+    └── libmyapp_utils.so (or .dylib)</code></pre>
+            </div>
+        </section>
+
+        <section id="customization">
+            <h2>Customization</h2>
+
+            <h3>Changing Build Configuration</h3>
+            <p>Edit <code>build.config.ts</code> to change project settings:</p>
+            <pre><code class="language-typescript">export const config: BuildConfig = {
+  projectName: "MyApp",
+  version: "1.0.0",
+  author: "Your Name",
+  buildTypes: ["Debug", "Release"],
+};</code></pre>
+
+            <h3>Modifying CMake Settings</h3>
+            <p>Edit <code>CMakeLists.txt</code> to add libraries or change settings.</p>
+
+            <h3>Adding New Source Files</h3>
+            <ol>
+                <li>Create new files under <code>src/</code></li>
+                <li>Add the files to the appropriate target in <code>CMakeLists.txt</code></li>
+                <li>Rebuild with <code>deno task rebuild</code></li>
+            </ol>
+        </section>
+
+        <section id="troubleshooting">
+            <h2>Troubleshooting</h2>
+
+            <div class="faq">
+                <div class="faq-item">
+                    <h4>CMake not found</h4>
+                    <p>Make sure CMake is installed:</p>
+                    <pre><code class="language-bash">cmake --version</code></pre>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Deno permission errors</h4>
+                    <p>The build script requires proper permissions:</p>
+                    <pre><code class="language-bash">deno run --allow-all build.ts</code></pre>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Build errors</h4>
+                    <p>Clean the build directory and try again:</p>
+                    <pre><code class="language-bash">deno task clean
+deno task build</code></pre>
+                </div>
+
+                <div class="faq-item">
+                    <h4>DLL not found (Windows)</h4>
+                    <p>Executables and DLLs are placed in the same directory.
+                       If you move the executable, copy the DLL along with it.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>
+                Created for <a href="https://qiita.com/advent-calendar/2025/deno">Deno Advent Calendar 2025</a>
+            </p>
+            <p>
+                <a href="https://github.com/COx2/deno-advent-calender-2025">GitHub Repository</a> |
+                MIT License
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+    <script>
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deno C++ Project Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .lang-select {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+        }
+        .lang-select h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .lang-select .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 50px;
+        }
+        .lang-cards {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .lang-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 40px 60px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        .lang-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #70c0ba;
+            transform: translateY(-5px);
+        }
+        .lang-card .flag {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+        .lang-card .lang-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .lang-card .lang-native {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+        .lang-select footer {
+            position: absolute;
+            bottom: 20px;
+            text-align: center;
+            width: 100%;
+            opacity: 0.7;
+        }
+        .lang-select footer a {
+            color: #70c0ba;
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-select">
+        <h1>Deno C++ Project Generator</h1>
+        <p class="subtitle">Select your language / 言語を選択してください</p>
+
+        <div class="lang-cards">
+            <a href="en/index.html" class="lang-card">
+                <div class="flag">🇺🇸</div>
+                <div class="lang-name">English</div>
+                <div class="lang-native">English</div>
+            </a>
+            <a href="ja/index.html" class="lang-card">
+                <div class="flag">🇯🇵</div>
+                <div class="lang-name">Japanese</div>
+                <div class="lang-native">日本語</div>
+            </a>
+        </div>
+
+        <footer>
+            <p>
+                <a href="https://github.com/COx2/deno-advent-calender-2025">GitHub Repository</a> |
+                MIT License
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Auto-detect language and redirect (optional)
+        // Uncomment to enable auto-redirect based on browser language
+        /*
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang.startsWith('ja')) {
+            window.location.href = 'ja/index.html';
+        } else {
+            window.location.href = 'en/index.html';
+        }
+        */
+    </script>
+</body>
+</html>

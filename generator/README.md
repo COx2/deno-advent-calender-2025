@@ -1,5 +1,122 @@
 # C++/CMake Project Generator
 
+A project generator that creates C++/CMake projects locally by running from a remote Deno URL.
+
+## Usage
+
+### Running from Remote URL
+
+Once hosted on GitHub, you can generate a project with the following command:
+
+```bash
+# Basic usage
+deno run --allow-read --allow-write --allow-run \
+  https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/generator/generate.ts
+
+# With options
+deno run --allow-read --allow-write --allow-run \
+  https://raw.githubusercontent.com/YOUR_USER/YOUR_REPO/main/generator/generate.ts \
+  --name "MyProject" \
+  --author "Your Name" \
+  --version "1.0.0" \
+  --output ./my-project \
+  --with-git
+```
+
+### Running Locally
+
+```bash
+cd generator
+deno run --allow-read --allow-write --allow-run generate.ts --name "TestProject"
+```
+
+## Options
+
+| Option | Short | Default | Description |
+|--------|-------|---------|-------------|
+| `--name` | `-n` | `MyApp` | Project name |
+| `--author` | `-a` | `Your Name` | Author name |
+| `--version` | `-v` | `1.0.0` | Version |
+| `--output` | `-o` | (project name) | Output directory |
+| `--with-git` | - | false | Initialize git repository |
+| `--help` | `-h` | - | Show help |
+
+## Generated Project Structure
+
+```
+<project-name>/
+├── CMakeLists.txt          # CMake configuration
+├── deno.json               # Deno task configuration
+├── build.ts                # Build script
+├── build.config.ts         # Build configuration
+├── cmake-file-api.ts       # CMake File API integration
+├── cmake-types.ts          # TypeScript type definitions
+├── .gitignore
+└── src/
+    ├── main.cpp            # Main entry point
+    ├── core/
+    │   ├── core.h          # Static library header
+    │   └── core.cpp        # Static library implementation
+    └── utils/
+        ├── utils.h         # Shared library header
+        └── utils.cpp       # Shared library implementation
+```
+
+## Post-Generation Workflow
+
+```bash
+cd <project-name>
+
+# Build
+deno task build              # Build in Release mode
+deno task build:debug        # Build in Debug mode
+
+# Clean
+deno task clean              # Remove build directory
+deno task rebuild            # Clean and rebuild
+
+# Test
+deno task test               # Build and run executable
+
+# Format & Lint
+deno task format             # Format TypeScript files
+deno task lint               # Run linter
+```
+
+## Requirements
+
+- [Deno](https://deno.land/) v1.40 or later
+- [CMake](https://cmake.org/) 3.15 or later
+- C++17 compatible compiler
+  - Windows: Visual Studio 2022
+  - macOS: Xcode Command Line Tools
+  - Linux: GCC 8+ or Clang 8+
+
+## Customization
+
+The generated project can be customized as follows:
+
+1. **CMakeLists.txt**: Add libraries, configure dependencies
+2. **build.config.ts**: Modify project metadata
+3. **src/**: Add or modify C++ source code
+
+## Hosting on GitHub Raw
+
+1. Fork or clone this repository
+2. Push the `generator/` directory to GitHub
+3. Access using the Raw URL:
+   ```
+   https://raw.githubusercontent.com/<user>/<repo>/<branch>/generator/generate.ts
+   ```
+
+## License
+
+MIT License
+
+---
+
+# C++/CMake プロジェクトジェネレーター (日本語)
+
 Deno URL実行でリモートからC++/CMakeプロジェクトをローカルに生成するジェネレーターです。
 
 ## 使い方

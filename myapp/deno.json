@@ -6,18 +6,21 @@
     "clean": "deno run --allow-all build.ts --clean",
     "rebuild": "deno run --allow-all build.ts --clean && deno run --allow-all build.ts --config Release",
     "test": "deno run --allow-all build.ts --test",
+    "msi": "deno run --allow-all msi-installer.ts",
+    "msi:release": "deno run --allow-all msi-installer.ts --config Release",
+    "package": "deno run --allow-all build.ts --config Release && deno run --allow-all msi-installer.ts --config Release",
     "format": "deno fmt",
     "format:check": "deno fmt --check",
     "lint": "deno lint"
   },
   "fmt": {
     "files": {
-      "include": ["build.ts", "build.config.ts", "cmake-file-api.ts", "cmake-types.ts"]
+      "include": ["build.ts", "build.config.ts", "cmake-file-api.ts", "cmake-types.ts", "msi-installer.ts"]
     }
   },
   "lint": {
     "files": {
-      "include": ["build.ts", "build.config.ts", "cmake-file-api.ts", "cmake-types.ts"]
+      "include": ["build.ts", "build.config.ts", "cmake-file-api.ts", "cmake-types.ts", "msi-installer.ts"]
     }
   }
 }
